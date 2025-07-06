@@ -1,68 +1,198 @@
-
+<!DOCTYPE html>
 <html lang="te">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#442C2E" />
-    <meta name="description" content="Telugu Bible Quiz - Learn God's Word with fun quizzes!" />
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>📖 తెలుగు బైబిల్ క్విజ్</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Noto Sans Telugu', sans-serif;
+      background: linear-gradient(to right, #fff8e1, #fbe9e7);
+      color: #4e342e;
+      padding: 1rem;
+    }
 
-    <link rel="icon" href="%PUBLIC_URL%/bible-icon.png" />
-    <title>📖 తెలుగు బైబిల్ క్విజ్</title>
+    h1, h2 {
+      text-align: center;
+      color: #6a1b9a;
+    }
 
-    <!-- Telugu Font -->
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Telugu&display=swap" rel="stylesheet" />
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background: #fff3e0;
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
 
-    <style>
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
+    .question {
+      margin-bottom: 1rem;
+    }
 
-      html, body {
-        height: 100%;
-        font-family: 'Noto Sans Telugu', sans-serif;
-        background: linear-gradient(to bottom right, #f3e5ab, #d8c3a5);
-        color: #3e2723;
-      }
+    .options button {
+      display: block;
+      width: 100%;
+      margin: 0.5rem 0;
+      padding: 0.75rem;
+      background: #d1c4e9;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
 
-      #root {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        height: 100%;
-        background-image: url('%PUBLIC_URL%/bible-bg.svg');
-        background-repeat: no-repeat;
-        background-position: center;
-        background-size: contain;
-      }
+    .options button:hover {
+      background: #b39ddb;
+    }
 
-      .loading {
-        font-size: 1.8rem;
-        font-weight: bold;
-        background-color: rgba(255, 255, 255, 0.75);
-        padding: 1rem 2rem;
-        border-radius: 1rem;
-        box-shadow: 0 0 10px rgba(0,0,0,0.2);
-      }
+    .result, .score-section {
+      text-align: center;
+      font-size: 1.2rem;
+      margin-top: 1rem;
+    }
 
-      @media (max-width: 600px) {
-        .loading {
-          font-size: 1.2rem;
-        }
-      }
-    </style>
-  </head>
+    .leaderboard {
+      margin-top: 2rem;
+    }
 
-  <body>
-    <noscript>
-      <div style="padding: 2rem; text-align: center;">
-        ఈ వెబ్‌సైట్‌ పనిచేయడానికి JavaScript అవసరం. దయచేసి మీ browser లో JavaScript ఎనేబుల్ చేయండి.
+    .leaderboard ol {
+      padding-left: 1.2rem;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .start-btn {
+      display: block;
+      margin: auto;
+      padding: 1rem 2rem;
+      background: #8e24aa;
+      color: white;
+      font-weight: bold;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>📖 తెలుగు బైబిల్ క్విజ్</h1>
+    <div id="quiz-container">
+      <div id="question-section">
+        <h2 id="question-text">ప్రశ్న ఇక్కడ చూపించబడుతుంది</h2>
+        <div class="options" id="options-container"></div>
+        <div class="result" id="answer-result"></div>
       </div>
-    </noscript>
 
-    <div id="root">
-      <div class="loading">లొడవుతుంది... ప్రార్థన చేయండి 😊</div>
+      <div class="score-section hidden" id="score-section">
+        <h2>మీ స్కోరు:</h2>
+        <p id="score-text"></p>
+        <button onclick="startQuiz()" class="start-btn">మళ్లీ ప్రయత్నించండి</button>
+      </div>
     </div>
-  </body>
+
+    <div class="leaderboard">
+      <h2>🏆 లీడర్బోర్డ్</h2>
+      <ol id="leaderboard-list">
+        <li>దేవిద్ - 5/5</li>
+        <li>రూత్ - 4/5</li>
+        <li>యోహాను - 3/5</li>
+      </ol>
+    </div>
+  </div>
+
+  <script>
+    const questions = [
+      {
+        question: "యేసు 40 రోజులు ఎక్కడ ఉపవాసం చేశాడు?",
+        options: ["ఊట్లో", "అరణ్యంలో", "దేవాలయంలొ", "సముద్రం దగ్గర"],
+        answer: "అరణ్యంలో"
+      },
+      {
+        question: "బైబిల్‌లో మొదటి పుస్తకం ఏమిటి?",
+        options: ["నిర్గమకాండము", "ఆదికాండము", "లేవీయకాండము", "కీర్తనలు"],
+        answer: "ఆదికాండము"
+      },
+      {
+        question: "దావీదు ఎవరు?",
+        options: ["రాజు", "యాజకుడు", "ప్రవక్త", "పిలవబడినవాడు"],
+        answer: "రాజు"
+      },
+      {
+        question: "యేసు ఏ నగరంలో పుట్టాడు?",
+        options: ["నజరేతు", "బేత్లహేము", "యెరూషలేము", "కపెర్నహూము"],
+        answer: "బేత్లహేము"
+      },
+      {
+        question: "యోహాను ఎవరు?",
+        options: ["యోహాను శిష్యుడు", "యోహాను బాప్తిస్మా", "యోహాను ప్రవక్త", "పౌలు"],
+        answer: "యోహాను బాప్తిస్మా"
+      }
+    ];
+
+    let currentQuestion = 0;
+    let score = 0;
+
+    const questionText = document.getElementById("question-text");
+    const optionsContainer = document.getElementById("options-container");
+    const answerResult = document.getElementById("answer-result");
+    const scoreSection = document.getElementById("score-section");
+    const scoreText = document.getElementById("score-text");
+
+    function loadQuestion() {
+      const q = questions[currentQuestion];
+      questionText.textContent = q.question;
+      optionsContainer.innerHTML = "";
+      answerResult.textContent = "";
+
+      q.options.forEach(option => {
+        const btn = document.createElement("button");
+        btn.textContent = option;
+        btn.onclick = () => checkAnswer(option);
+        optionsContainer.appendChild(btn);
+      });
+    }
+
+    function checkAnswer(selected) {
+      const correct = questions[currentQuestion].answer;
+      if (selected === correct) {
+        answerResult.textContent = "✔️ సరి!";
+        score++;
+      } else {
+        answerResult.textContent = `❌ తప్పుడు సమాధానం. సరైనది: ${correct}`;
+      }
+
+      setTimeout(() => {
+        currentQuestion++;
+        if (currentQuestion < questions.length) {
+          loadQuestion();
+        } else {
+          showScore();
+        }
+      }, 1000);
+    }
+
+    function showScore() {
+      document.getElementById("question-section").classList.add("hidden");
+      scoreSection.classList.remove("hidden");
+      scoreText.textContent = `${questions.length} లో మీరు ${score} సాధించారు`;
+    }
+
+    function startQuiz() {
+      currentQuestion = 0;
+      score = 0;
+      scoreSection.classList.add("hidden");
+      document.getElementById("question-section").classList.remove("hidden");
+      loadQuestion();
+    }
+
+    // Start initially
+    startQuiz();
+  </script>
+</body>
 </html>
